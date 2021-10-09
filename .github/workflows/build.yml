@@ -67,6 +67,21 @@ jobs:
           cp libsu/io/build/outputs/aar/io-release.aar Magisk/app/libs/
           cp libsu/core/build/outputs/aar/core-release.aar Magisk/app/libs/
 
+      - name: Update Magisk Version
+        run: |
+          cp Magisk/config.prop.sample Magisk/config.prop
+          sed -i s/version=string/version=23.0/g Magisk/config.prop
+          curl -s https://android.googlesource.com/platform/build/+/refs/heads/master/target/product/security/testkey.x509.pem?format=TEXT | base64 -d > testkey.x509.pem
+          curl -s https://android.googlesource.com/platform/build/+/refs/heads/master/target/product/security/testkey.pk8?format=TEXT | base64 -d > testkey.pk8
+          openssl pkcs8 -in testkey.pk8 -inform DER -outform PEM -out testkey.priv.pem -nocrypt
+          openssl pkcs12 -export -in testkey.x509.pem -inkey testkey.priv.pem -out testkey.pk12 -password pass:android -name androiddebugkey
+          keytool -importkeystore -srckeystore testkey.pk12 -srcstoretype PKCS12 -srcstorepass android -alias androiddebugkey -deststoretype JKS -destkeystore Magisk/test.jks -deststorepass android
+          sed -i s/outdir=string/outdir=out/g Magisk/config.prop
+          sed -i s/keyStore=string/keyStore=test.jks/g Magisk/config.prop
+          sed -i s/keyStorePass=string/keyStorePass=android/g Magisk/config.prop
+          sed -i s/keyAlias=string/keyAlias=androiddebugkey/g Magisk/config.prop
+          sed -i s/keyPass=string/keyPass=android/g Magisk/config.prop
+
       - name: Apply Magisk Patches
         run: |
           git -C Magisk apply ../patches/Magisk/Magisk-su2suu.diff
