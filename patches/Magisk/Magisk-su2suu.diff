@@ -1,0 +1,26 @@
+diff --git a/app/src/main/java/com/topjohnwu/magisk/ui/MainActivity.kt b/app/src/main/java/com/topjohnwu/magisk/ui/MainActivity.kt
+index 227a6065..95885d83 100644
+--- a/app/src/main/java/com/topjohnwu/magisk/ui/MainActivity.kt
++++ b/app/src/main/java/com/topjohnwu/magisk/ui/MainActivity.kt
+@@ -193,7 +193,7 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
+         if (!Info.isEmulator && Info.env.isActive && System.getenv("PATH")
+                 ?.split(':')
+                 ?.filterNot { File("$it/magisk").exists() }
+-                ?.any { File("$it/su").exists() } == true) {
++                ?.any { File("$it/suu").exists() } == true) {
+             MagiskDialog(this)
+                 .applyTitle(R.string.unsupport_general_title)
+                 .applyMessage(R.string.unsupport_other_su_msg)
+diff --git a/native/jni/include/magisk.hpp b/native/jni/include/magisk.hpp
+index f954f10e..384a2914 100644
+--- a/native/jni/include/magisk.hpp
++++ b/native/jni/include/magisk.hpp
+@@ -24,7 +24,7 @@ extern std::string  MAGISKTMP;
+ #define ROOTOVL     INTLROOT "/rootdir"
+ #define ROOTMNT     ROOTOVL "/.mount_list"
+ 
+-constexpr const char *applet_names[] = { "su", "resetprop", "magiskhide", nullptr };
++constexpr const char *applet_names[] = { "suu", "resetprop", "magiskhide", nullptr };
+ constexpr const char *init_applet[] = { "magiskpolicy", "supolicy", nullptr };
+ 
+ #define POST_FS_DATA_WAIT_TIME       40

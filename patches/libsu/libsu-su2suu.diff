@@ -1,0 +1,35 @@
+diff --git a/core/src/main/java/com/topjohnwu/superuser/internal/BuilderImpl.java b/core/src/main/java/com/topjohnwu/superuser/internal/BuilderImpl.java
+index 90a4dbd..dda4b9c 100644
+--- a/core/src/main/java/com/topjohnwu/superuser/internal/BuilderImpl.java
++++ b/core/src/main/java/com/topjohnwu/superuser/internal/BuilderImpl.java
+@@ -47,7 +47,7 @@ public class BuilderImpl extends Shell.Builder {
+         // Root mount master
+         if (!hasFlags(FLAG_NON_ROOT_SHELL) && hasFlags(FLAG_MOUNT_MASTER)) {
+             try {
+-                shell = build("su", "--mount-master");
++                shell = build("suu", "--mount-master");
+                 if (shell.getStatus() != Shell.ROOT_MOUNT_MASTER)
+                     shell = null;
+             } catch (NoShellException ignore) {}
+@@ -56,7 +56,7 @@ public class BuilderImpl extends Shell.Builder {
+         // Normal root shell
+         if (shell == null && !hasFlags(FLAG_NON_ROOT_SHELL)) {
+             try {
+-                shell = build("su");
++                shell = build("suu");
+                 if (shell.getStatus() != ROOT_SHELL)
+                     shell = null;
+             } catch (NoShellException ignore) {}
+diff --git a/core/src/main/java/com/topjohnwu/superuser/internal/Utils.java b/core/src/main/java/com/topjohnwu/superuser/internal/Utils.java
+index 9c08d72..6129b7c 100644
+--- a/core/src/main/java/com/topjohnwu/superuser/internal/Utils.java
++++ b/core/src/main/java/com/topjohnwu/superuser/internal/Utils.java
+@@ -34,7 +34,7 @@ import java.nio.charset.StandardCharsets;
+ import java.util.Collection;
+ import java.util.Collections;
+ 
+-@RestrictTo(RestrictTo.Scope.LIBRARY)
++//@RestrictTo(RestrictTo.Scope.LIBRARY)
+ public final class Utils {
+ 
+     @SuppressLint("StaticFieldLeak")

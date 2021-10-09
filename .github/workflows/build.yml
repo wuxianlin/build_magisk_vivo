@@ -1,0 +1,99 @@
+name: Magisk Build
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: Build on Magisk
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out patches
+        uses: actions/checkout@v2
+
+      - name: Check out Magisk
+        uses: actions/checkout@v2
+        with:
+          path: Magisk
+          repository: topjohnwu/Magisk
+          ref: f822ca5b23bea0a1b7a6e97841e253398e79fb8e
+          submodules: 'recursive'
+          fetch-depth: 0
+
+      - name: Check out libsu
+        uses: actions/checkout@v2
+        with:
+          path: libsu
+          repository: topjohnwu/libsu
+          ref: fb87c2464d127a5eaef5216792dd05cd8ef6123c
+          fetch-depth: 0
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: '11'
+
+      - name: Set up Python 3
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Set up GitHub env
+        run: |
+          ndk_ver=$(sed -n 's/^magisk.fullNdkVersion=//p' Magisk/gradle.properties)
+          echo ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT >> $GITHUB_ENV
+          echo MAGISK_NDK_VERSION=$ndk_ver >> $GITHUB_ENV
+
+      - name: Set up NDK
+        run: |
+          cd Magisk
+          python build.py ndk
+
+      - name: Apply libsu Patches
+        run: |
+          git -C libsu apply ../patches/libsu/libsu-su2suu.diff
+
+      - name: Build libsuu
+        run: |
+          cd libsu
+          ./gradlew :core:build
+          ./gradlew :io:build
+
+      - name: Copy libsuu libs
+        run: |
+          mkdir Magisk/app/libs
+          cp libsu/io/build/outputs/aar/io-release.aar Magisk/app/libs/
+          cp libsu/core/build/outputs/aar/core-release.aar Magisk/app/libs/
+
+      - name: Apply Magisk Patches
+        run: |
+          git -C Magisk apply ../patches/Magisk/Magisk-su2suu.diff
+          git -C Magisk apply ../patches/Magisk/use-local-libsu.diff
+
+      - name: Build Magisk
+        run: |
+          cd Magisk
+          python build.py -vr all
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Magisk.apk
+          path: Magisk/out/app-release.apk
+
+      - name: Apply Magisk test Patches
+        run: |
+          git -C Magisk apply ../patches/Magisk/mountbind2product.diff
+
+      - name: Build Magisk test
+        run: |
+          cd Magisk
+          python build.py -vr all
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Magisk-test.apk
+          path: Magisk/out/app-release.apk

@@ -1,0 +1,24 @@
+diff --git a/app/build.gradle.kts b/app/build.gradle.kts
+index 4c50bed2..64c27c3d 100644
+--- a/app/build.gradle.kts
++++ b/app/build.gradle.kts
+@@ -181,7 +181,7 @@ android.applicationVariants.all {
+ }
+ 
+ dependencies {
+-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
++    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
+     implementation(kotlin("stdlib"))
+     // Some dependencies request JDK 8 stdlib, specify manually here to prevent version mismatch
+     implementation(kotlin("stdlib-jdk8"))
+@@ -208,8 +208,8 @@ dependencies {
+     implementation("com.caverock:androidsvg:1.4")
+ 
+     val vLibsu = "3.1.2"
+-    implementation("com.github.topjohnwu.libsu:core:${vLibsu}")
+-    implementation("com.github.topjohnwu.libsu:io:${vLibsu}")
++    //implementation("com.github.topjohnwu.libsu:core:${vLibsu}")
++    //implementation("com.github.topjohnwu.libsu:io:${vLibsu}")
+ 
+     val vRetrofit = "2.9.0"
+     implementation("com.squareup.retrofit2:retrofit:${vRetrofit}")
