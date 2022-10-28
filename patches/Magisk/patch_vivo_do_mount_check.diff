@@ -1,0 +1,16 @@
+diff --git a/scripts/boot_patch.sh b/scripts/boot_patch.sh
+index c334e8d84..53766851a 100644
+--- a/scripts/boot_patch.sh
++++ b/scripts/boot_patch.sh
+@@ -205,6 +205,11 @@ if [ -f kernel ]; then
+   # After:  [mov w2, #-32768]
+   ./magiskboot hexpatch kernel 821B8012 E2FF8F12
+ 
++  # patch vivo do_mount_check
++  # /system -> /syswxl
++  # python3 -c "print(hex(int.from_bytes(b'/system', 'big')^int('bdbcbbbab9b8b7', 16)))"
++  ./magiskboot hexpatch kernel 0092CFC2C9CDDDDA00 0092CFC2C9CEC0DB00
++
+   # Force kernel to load rootfs
+   # skip_initramfs -> want_initramfs
+   ./magiskboot hexpatch kernel \

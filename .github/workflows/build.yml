@@ -18,7 +18,7 @@ jobs:
         with:
           path: Magisk
           repository: topjohnwu/Magisk
-          ref: f822ca5b23bea0a1b7a6e97841e253398e79fb8e
+          ref: 6066b5cf86703512451a021cf1aaf1a877530af7
           submodules: 'recursive'
           fetch-depth: 0
 
@@ -27,7 +27,7 @@ jobs:
         with:
           path: libsu
           repository: topjohnwu/libsu
-          ref: fb87c2464d127a5eaef5216792dd05cd8ef6123c
+          ref: 9aa478c054d8d53b66b4401cb60e7139d46ede49
           fetch-depth: 0
 
       - name: Set up JDK 11
@@ -42,9 +42,9 @@ jobs:
 
       - name: Set up GitHub env
         run: |
-          ndk_ver=$(sed -n 's/^magisk.fullNdkVersion=//p' Magisk/gradle.properties)
+          ndk_ver=$(sed -n 's/^magisk.ondkVersion=//p' Magisk/gradle.properties)
           echo ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT >> $GITHUB_ENV
-          echo MAGISK_NDK_VERSION=$ndk_ver >> $GITHUB_ENV
+          echo ONDK_VERSION=$ndk_ver >> $GITHUB_ENV
 
       - name: Set up NDK
         run: |
@@ -59,18 +59,20 @@ jobs:
         run: |
           cd libsu
           ./gradlew :core:build
-          ./gradlew :io:build
+          ./gradlew :service:build
+          ./gradlew :nio:build
 
       - name: Copy libsuu libs
         run: |
           mkdir Magisk/app/libs
-          cp libsu/io/build/outputs/aar/io-release.aar Magisk/app/libs/
+          cp libsu/nio/build/outputs/aar/nio-release.aar Magisk/app/libs/
+          cp libsu/service/build/outputs/aar/service-release.aar Magisk/app/libs/
           cp libsu/core/build/outputs/aar/core-release.aar Magisk/app/libs/
 
       - name: Update Magisk Version
         run: |
           cp Magisk/config.prop.sample Magisk/config.prop
-          sed -i s/version=string/version=23.0/g Magisk/config.prop
+          sed -i s/version=string/version=25.2/g Magisk/config.prop
           curl -s https://android.googlesource.com/platform/build/+/refs/heads/master/target/product/security/testkey.x509.pem?format=TEXT | base64 -d > testkey.x509.pem
           curl -s https://android.googlesource.com/platform/build/+/refs/heads/master/target/product/security/testkey.pk8?format=TEXT | base64 -d > testkey.pk8
           openssl pkcs8 -in testkey.pk8 -inform DER -outform PEM -out testkey.priv.pem -nocrypt
@@ -100,7 +102,8 @@ jobs:
 
       - name: Apply Magisk test Patches
         run: |
-          git -C Magisk apply ../patches/Magisk/mountbind2product.diff
+          git -C Magisk apply ../patches/Magisk/patch_vivo_do_mount_check.diff
+          #git -C Magisk apply ../patches/Magisk/mountbind2product.diff
 
       - name: Build Magisk test
         run: |
