@@ -102,7 +102,7 @@ jobs:
 
       - name: Apply Magisk test Patches
         run: |
-          git -C Magisk apply ../patches/Magisk/patch_vivo_do_mount_check.diff
+          #git -C Magisk apply ../patches/Magisk/patch_vivo_do_mount_check.diff
           #git -C Magisk apply ../patches/Magisk/mountbind2product.diff
 
       - name: Build Magisk test
